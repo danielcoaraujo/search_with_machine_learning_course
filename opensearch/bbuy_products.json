@@ -1,6 +1,23 @@
 {
   "settings": {
-    "index.refresh_interval": "5s"
+    "index.refresh_interval": "5s",
+    "analysis": {
+      "analyzer": {
+        "default_analyzer": {
+          "tokenizer": "standard",
+          "filter": [
+            "lowercase",
+            "default_stemmer"
+          ]
+        }
+      },
+      "filter": {
+        "default_stemmer": {
+          "type": "stemmer",
+          "language": "english"
+        }
+      }
+    }
   },
   "mappings": {
     "properties":{
@@ -24,6 +41,18 @@
             "ignore_above": 256
           }
         }
+      },
+      "name": {
+        "type": "text",
+        "analyzer": "default_analyzer"
+      },
+      "shortDescription": {
+        "type": "text",
+        "analyzer": "default_analyzer"
+      },
+      "longDescription": {
+        "type": "text",
+        "analyzer": "default_analyzer"
       }
     }
   }
