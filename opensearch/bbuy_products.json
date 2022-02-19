@@ -55,7 +55,13 @@
         "analyzer": "default_analyzer"
       },
       "department": {
-        "type": "text"
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
       },
       "regularPrice": {
         "type": "float"
