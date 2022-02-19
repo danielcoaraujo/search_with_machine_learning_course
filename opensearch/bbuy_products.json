@@ -54,6 +54,9 @@
         "type": "text",
         "analyzer": "default_analyzer"
       },
+      "image": {
+        "type": "keyword"
+      },
       "department": {
         "type": "text",
         "fields": {

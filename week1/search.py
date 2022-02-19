@@ -103,7 +103,37 @@ def create_query(user_query, filters, sort="_score", sortDir="desc"):
             }
         },
         "aggs": {
-            #TODO: FILL ME IN
+            "departments": {
+                "terms": {
+                    "field": "department.keyword",
+                    "size": 10,
+                    "missing": "N/A",
+                    "min_doc_count": 0
+                }
+            },
+            "missing_images": {
+                "terms": {
+                    "field": "image.keyword",
+                }
+            },
+            "regularPrice": {
+                "range": {
+                    "field": "regularPrice",
+                    "ranges": [
+                    {
+                        "from": 0,
+                        "to": 100
+                    },
+                    {
+                        "from": 100,
+                        "to": 500
+                    },
+                    {
+                        "from": 500
+                    }
+                    ]
+                }
+            },
         },
         "sort": [{
             sort: {
