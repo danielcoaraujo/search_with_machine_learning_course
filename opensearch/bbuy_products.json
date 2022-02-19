@@ -53,6 +53,12 @@
       "longDescription": {
         "type": "text",
         "analyzer": "default_analyzer"
+      },
+      "department": {
+        "type": "text"
+      },
+      "regularPrice": {
+        "type": "float"
       }
     }
   }
