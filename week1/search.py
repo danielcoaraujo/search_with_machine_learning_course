@@ -97,8 +97,9 @@ def create_query(user_query, filters, sort="_score", sortDir="desc"):
     query_obj = {
         "size": 10,
         "query": {
-            "match": {
-                "name": user_query
+            "multi_match": {
+                "fields": ["name^100", "shortDescription^50", "longDescription^10", "department"],
+                "query": user_query
             }
         },
         "aggs": {
