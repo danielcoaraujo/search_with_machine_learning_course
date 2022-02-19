@@ -74,7 +74,12 @@ def query():
         query_obj = create_query("*", [], sort, sortDir)
 
     print("query obj: {}".format(query_obj))
-    response = None   # TODO: Replace me with an appropriate call to OpenSearch
+
+    response = opensearch.search(
+        body = query_obj,
+        index = "bbuy_products"
+    )
+
     # Postprocess results here if you so desire
 
     #print(response)
@@ -88,13 +93,21 @@ def query():
 
 def create_query(user_query, filters, sort="_score", sortDir="desc"):
     print("Query: {} Filters: {} Sort: {}".format(user_query, filters, sort))
+
     query_obj = {
-        'size': 10,
+        "size": 10,
         "query": {
-            "match_all": {} # Replace me with a query that both searches and filters
+            "match": {
+                "name": user_query
+            }
         },
         "aggs": {
             #TODO: FILL ME IN
-        }
+        },
+        "sort": [{
+            sort: {
+                "order": sortDir
+            }
+        }]
     }
     return query_obj
