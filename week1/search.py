@@ -24,16 +24,39 @@ def process_filters(filters_input):
         display_name = request.args.get(filter + ".displayName", filter)
         #
         # We need to capture and return what filters are already applied so they can be automatically added to any existing links we display in aggregations.jinja2
-        applied_filters += "&filter.name={}&{}.type={}&{}.displayName={}".format(filter, filter, type, filter,
-                                                                                 display_name)
+        applied_filters += "&filter.name={}&{}.type={}&{}.displayName={}".format(filter, filter, type, filter, display_name)
         #TODO: IMPLEMENT AND SET filters, display_filters and applied_filters.
         # filters get used in create_query below.  display_filters gets used by display_filters.jinja2 and applied_filters gets used by aggregations.jinja2 (and any other links that would execute a search.)
         if type == "range":
-            pass
-        elif type == "terms":
-            pass #TODO: IMPLEMENT
-    print("Filters: {}".format(filters))
+            from_value = request.args.get(filter + ".from", None)
+            to_value = request.args.get(filter + ".to", None)
+            to_from = {}
 
+            if from_value:
+                to_from["gte"] = from_value
+            else:
+                from_value = "*"
+
+            if to_value:
+                to_from["lt"] = to_value
+            else:
+                to_value = "*"
+
+            range_filter = {"range": {filter: to_from}}
+            filters.append(range_filter)
+            display_filters.append("{}: {} TO {}".format(display_name, from_value, to_value))
+            applied_filters += "&{}.from={}&{}.to={}".format(filter, from_value, filter, to_value)
+
+        elif type == "terms":
+            field = request.args.get(filter + ".fieldName", filter)
+            key = request.args.get(filter + ".key", None)
+            term_filter = {"term": {field+".keyword": key}}
+            filters.append(term_filter)
+
+            display_filters.append("{}: {}".format(display_name, key))
+            applied_filters += "&{}.fieldName={}&{}.key={}".format(filter, field, filter, key)
+
+    print("Filters: {}".format(filters))
     return filters, display_filters, applied_filters
 
 
@@ -82,7 +105,6 @@ def query():
 
     # Postprocess results here if you so desire
 
-    #print(response)
     if error is None:
         return render_template("search_results.jinja2", query=user_query, search_response=response,
                                display_filters=display_filters, applied_filters=applied_filters,
@@ -92,14 +114,30 @@ def query():
 
 
 def create_query(user_query, filters, sort="_score", sortDir="desc"):
-    print("Query: {} Filters: {} Sort: {}".format(user_query, filters, sort))
+    query = {
+        "multi_match": {
+            "query": user_query,
+            "fields": ["name^100", "shortDescription^50", "longDescription^10", "department"]
+        }
+    }
+
+    if user_query == '*':
+        query = {
+            "match_all": {}
+        }
 
     query_obj = {
         "size": 10,
         "query": {
-            "multi_match": {
-                "fields": ["name^100", "shortDescription^50", "longDescription^10", "department"],
-                "query": user_query
+            "function_score": {
+                "query": {
+                    "bool": {
+                        "must": [
+                            query
+                        ],
+                        "filter": filters
+                    }
+                }
             }
         },
         "aggs": {
@@ -107,8 +145,6 @@ def create_query(user_query, filters, sort="_score", sortDir="desc"):
                 "terms": {
                     "field": "department.keyword",
                     "size": 10,
-                    "missing": "N/A",
-                    "min_doc_count": 0
                 }
             },
             "missing_images": {

@@ -55,7 +55,13 @@
         "analyzer": "default_analyzer"
       },
       "image": {
-        "type": "keyword"
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
       },
       "department": {
         "type": "text",
