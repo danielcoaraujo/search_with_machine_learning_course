@@ -10,7 +10,7 @@ reindex_init () {
     sh delete-indexes.sh
     
     echo "Indexing data ..."
-    sh index-data.sh
+    sh ./index-data.sh -p /workspace/search_with_machine_learning_course/week2/conf/bbuy_products.json -q /workspace/search_with_machine_learning_course/week2/conf/bbuy_queries.json
 }
 
 
