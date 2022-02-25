@@ -12,3 +12,5 @@ reindex_init () {
     echo "Indexing data ..."
     sh ./index-data.sh -p /workspace/search_with_machine_learning_course/week2/conf/bbuy_products.json -q /workspace/search_with_machine_learning_course/week2/conf/bbuy_queries.json
 }
+
+reindex_init

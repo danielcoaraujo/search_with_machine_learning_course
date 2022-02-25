@@ -1,4 +1,9 @@
 pyenv activate search_with_ml_week2
+
 export FLASK_ENV=development
 export FLASK_APP=week2
 flask run --port 3000 
+
+pip install -r requirements_week2.txt
+pip install jupyterlab
+jupyter lab --NotebookApp.allow_origin='*'
