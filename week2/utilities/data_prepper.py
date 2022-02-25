@@ -244,7 +244,8 @@ class DataPrepper:
             feature["doc_id"] = hit['_id']
             feature["sku"] = hit['_id']
             feature["query_id"] = query_id
-            feature["salePrice"] = hit['_source'].get('salePrice')
+            # TODO: Fix to get the first position. This way im getting a list.
+            # feature["salePrice"] = hit['_source'].get('salePrice')
             feature["name_match"] = hit['_source'].get('name_match')
             feature_results.append(feature)
         frame = pd.DataFrame(feature_results)
