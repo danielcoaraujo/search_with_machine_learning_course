@@ -7,3 +7,5 @@ flask run --port 3000
 pip install -r requirements_week2.txt
 pip install jupyterlab
 jupyter lab --NotebookApp.allow_origin='*'
+
+./ltr-end-to-end.sh -y
