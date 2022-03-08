@@ -8,6 +8,7 @@ from nltk.stem import SnowballStemmer
 from nltk import sent_tokenize, word_tokenize
 
 snowball = SnowballStemmer("english")
+nltk.download('punkt')
 
 def transform_name(product_name):
     tokens = word_tokenize(product_name)
@@ -78,7 +79,7 @@ with open(output_file, 'w') as output:
 
                       # Write only if there is more than the minimum
                       if registry[cat] > min_products:
-                          output.write("__label__%s %s\n" % (cat, transform_name(name)))
+                            output.write("__label__%s %s\n" % (cat, transform_name(name)))
 
 print("Count of categories: ", len(registry.keys()))
 print("Count of categories in output: ", number_of_categories)
