@@ -3,9 +3,18 @@ import os
 import random
 import xml.etree.ElementTree as ET
 from pathlib import Path
+import nltk
+from nltk.stem import SnowballStemmer
+from nltk import sent_tokenize, word_tokenize
+
+snowball = SnowballStemmer("english")
 
 def transform_name(product_name):
-    # IMPLEMENT
+    tokens = word_tokenize(product_name)
+    tokens = [word for word in tokens if word.isalpha()]
+    tokens = [word.lower() for word in tokens]
+    tokens = [snowball.stem(word) for word in tokens]
+    product_name = " ".join(tokens)
     return product_name
 
 # Directory for product data
@@ -27,13 +36,16 @@ output_file = args.output
 path = Path(output_file)
 output_dir = path.parent
 if os.path.isdir(output_dir) == False:
-        os.mkdir(output_dir)
+    os.mkdir(output_dir)
 
 if args.input:
     directory = args.input
 # IMPLEMENT:  Track the number of items in each category and only output if above the min
 min_products = args.min_products
 sample_rate = args.sample_rate
+
+registry = {}
+number_of_categories = 0
 
 print("Writing results to %s" % output_file)
 with open(output_file, 'w') as output:
@@ -54,5 +66,20 @@ with open(output_file, 'w') as output:
                       cat = child.find('categoryPath')[len(child.find('categoryPath')) - 1][0].text
                       # Replace newline chars with spaces so fastText doesn't complain
                       name = child.find('name').text.replace('\n', ' ')
-                      output.write("__label__%s %s\n" % (cat, transform_name(name)))
+
+                      # Counting
+                      count_by_category = registry.get(cat)
+                      if count_by_category is None:
+                          registry[cat] = 1
+                      else:
+                          registry[cat] = count_by_category + 1
+                          if count_by_category == min_products:
+                              number_of_categories += 1
+
+                      # Write only if there is more than the minimum
+                      if registry[cat] > min_products:
+                          output.write("__label__%s %s\n" % (cat, transform_name(name)))
+
+print("Count of categories: ", len(registry.keys()))
+print("Count of categories in output: ", number_of_categories)
 
